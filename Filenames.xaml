@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Rwb.Images.Filenames"
+             Title="Filenames and timestamps">
+    <VerticalStackLayout>
+        <Button
+                x:Name="ButtonChooseLocation"
+                Text="Choose location" 
+                Clicked="OnClickButtonChooseLocation"
+                HorizontalOptions="Fill" />
+        <Label
+                x:Name="LabelLocation"
+                Text="" />
+        <Button
+                x:Name="ButtonStart"
+                Text="GO" 
+                Clicked="OnClickButtonStart"
+                HorizontalOptions="Fill" 
+                IsEnabled="False"
+                />
+        <Label
+                x:Name="LabelScanning"
+                Text="" />
+    </VerticalStackLayout>
+</ContentPage>

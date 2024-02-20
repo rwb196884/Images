@@ -1,2 +1,5 @@
 # Images
-Application to fix image filenames and timestamps.
+
+Simple app to:
+* find duplicate images, present them for inspection, and delete or keep; and
+* fix filenes and timestamps.
