@@ -15,7 +15,6 @@ namespace Rwb.Images
 
     internal class ProgressEventArgs
     {
-        public int Percent { get; set; }
         public string Message { get; set; }
     }
 
@@ -49,7 +48,7 @@ namespace Rwb.Images
             Process(_Root);
             if (OnProgress != null)
             {
-                OnProgress(this, new ProgressEventArgs() { Percent = 0, Message = $"Comparing {_Files} files..." });
+                OnProgress(this, new ProgressEventArgs() { Message = $"Comparing {_Files} files..." });
             }
 
             Compared = _Hashes.SelectMany(z =>
@@ -64,7 +63,7 @@ namespace Rwb.Images
             .ToList();
             if (OnProgress != null)
             {
-                OnProgress(this, new ProgressEventArgs() { Percent = 0, Message = $"Compared {_Hashes.Count} files." });
+                OnProgress(this, new ProgressEventArgs() {  Message = $"Compared {_Hashes.Count} files." });
             }
         }
 
@@ -98,9 +97,8 @@ namespace Rwb.Images
             _Files++;
             if(OnProgress != null)
             {
-                OnProgress(this, new ProgressEventArgs() { Percent = 0, Message = $"Found {_Files} files..." });
+                OnProgress(this, new ProgressEventArgs() { Message = $"Found {_Files} files..." });
             }
         }
-
     }
 }

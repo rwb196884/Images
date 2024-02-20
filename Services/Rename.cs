@@ -8,13 +8,21 @@ using IM = MetadataExtractor;
 
 namespace Rwb.Images
 {
-       internal class RenameProgressEventArgs
+    internal class MoveSuggestion
     {
-        public string OldName { get; set; }
+        public FileInfo File { get; set; }
+        public DateTime ImageDate { get; set; }
         public string NewName { get; set; }
+
+        public void Do()
+        {
+            string newPath = Path.Combine(File.Directory.FullName, NewName);
+            System.IO.File.Move(File.FullName, newPath);
+            System.IO.File.SetCreationTime(newPath, ImageDate);
+        }
     }
 
-    internal delegate void RenameProgressEvent(object sender, RenameProgressEventArgs args);
+    internal delegate void RenameProgressEvent(object sender, ProgressEventArgs args);
 
     class FilenameRewrite
     {
@@ -41,12 +49,20 @@ namespace Rwb.Images
 
         public bool Test(FileInfo f)
         {
-            throw new NotImplementedException();
+            return Source.IsMatch(f.Name);
         }
 
-        public Match Match(string thing)
+        public DateTime GetImageDate(FileInfo f)
         {
-            throw new NotImplementedException();
+            DateTime t = DateTime.Now;
+            Match m = Source.Match(f.Name);
+            return new DateTime(
+                MatchYear.HasValue ? int.Parse(m.Groups[MatchYear.Value].Value) : t.Year,
+                MatchMonth.HasValue ? int.Parse(m.Groups[MatchMonth.Value].Value) : t.Month,
+                MatchDay.HasValue ? int.Parse(m.Groups[MatchDay.Value].Value) : t.Day,
+                MatchHour.HasValue ? int.Parse(m.Groups[MatchHour.Value].Value) : 0,
+                MatchMinute.HasValue ? int.Parse(m.Groups[MatchMinute.Value].Value) : 0,
+                MatchSecond.HasValue ? int.Parse(m.Groups[MatchSecond.Value].Value) : 0);
         }
     }
 
@@ -59,22 +75,32 @@ namespace Rwb.Images
 
         private readonly Dictionary<string, int> _OtherExtensions;
 
-        private static readonly FilenameRewrite _re0 = new FilenameRewrite(@"^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})");
-        private static readonly FilenameRewrite _re1 = new FilenameRewrite(@"^IMG_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})");
-        private static readonly FilenameRewrite _re2 = new FilenameRewrite(@"^PXL_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})");
-        private static readonly FilenameRewrite _re3 = new FilenameRewrite(@"^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})");
-
         private readonly DirectoryInfo _Root;
+        private readonly List<FilenameRewrite> _Rewriters;
+
+        public List<MoveSuggestion> Moves { get; private set; }
 
         public Rename(DirectoryInfo root)
         {
             _OtherExtensions = new Dictionary<string, int>();
             _Root = root;
+            _Rewriters = new List<FilenameRewrite>()
+            {
+                // Order is important!
+                new FilenameRewrite(@"^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})"),
+                new FilenameRewrite(@"^IMG_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})"),
+                new FilenameRewrite(@"^PXL_(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})"),
+                new FilenameRewrite(@"^(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})"),
+                new FilenameRewrite(@"^IMG", null, null, null, null, null, null),
+                new FilenameRewrite(@"^IMGA", null, null, null, null, null, null)
+            };
+            Moves = new List<MoveSuggestion>();
         }
 
         public void Detect()
         {
             Process(_Root);
+
             if (OnProgress != null)
             {
                 //OnProgress(this, new ProgressEventArgs() { Percent = 0, Message = $"Comparing {_Files} files..." });
@@ -109,14 +135,12 @@ namespace Rwb.Images
                 return;
             }
 
-            Match m0 = _re0.Match(file.Name);
-            Match m1 = _re1.Match(file.Name);
-            Match m2 = _re2.Match(file.Name);
-            Match m3 = _re3.Match(file.Name);
-            if (!(file.Name.StartsWith("IMAG") || file.Name.StartsWith("IMG") || (new Match[] { m0, m1, m2, m3 }).Any(z => z.Success)))
+            FilenameRewrite rw = _Rewriters.FirstOrDefault(z => z.Test(file));
+            if (rw == null)
             {
                 return;
             }
+
             List<IM.Tag> d = new List<IM.Tag>();
             try
             {
@@ -140,33 +164,7 @@ namespace Rwb.Images
                 }
             }
 
-            if (m0.Success)
-            {
-                DateTime t0 = new DateTime(int.Parse(m0.Groups[1].Value), int.Parse(m0.Groups[2].Value), int.Parse(m0.Groups[3].Value), int.Parse(m0.Groups[4].Value), int.Parse(m0.Groups[5].Value), int.Parse(m0.Groups[6].Value));
-                Move(file, t0);
-                return;
-            }
-
-            if (m1.Success)
-            {
-                DateTime t1 = new DateTime(int.Parse(m1.Groups[1].Value), int.Parse(m1.Groups[2].Value), int.Parse(m1.Groups[3].Value));
-                Move(file, t1);
-                return;
-            }
-
-            if (m2.Success)
-            {
-                DateTime t2 = new DateTime(int.Parse(m2.Groups[1].Value), int.Parse(m2.Groups[2].Value), int.Parse(m2.Groups[3].Value));
-                Move(file, t2);
-                return;
-            }
-
-            if (m3.Success)
-            {
-                DateTime t3 = new DateTime(int.Parse(m3.Groups[1].Value), int.Parse(m3.Groups[2].Value), int.Parse(m3.Groups[3].Value), int.Parse(m3.Groups[4].Value), int.Parse(m3.Groups[5].Value), int.Parse(m3.Groups[6].Value));
-                Move(file, t3);
-                return;
-            }
+            Move(file, rw.GetImageDate(file));
         }
 
         private static DateTime? GetImageDate(IEnumerable<IM.Tag> tags)
@@ -191,22 +189,30 @@ namespace Rwb.Images
             return dates.GroupBy(z => z).OrderByDescending(z => z.Count()).FirstOrDefault()?.Key;
         }
 
-        private static void Move(FileInfo f, DateTime t)
+        private void Move(FileInfo f, DateTime t)
         {
             string newName = $"{t.Year:0000}-{t.Month:00}-{t.Day:00}_{t.Hour:00}-{t.Minute:00}{f.Extension.ToLower()}";
             string newPath = Path.Combine(f.Directory.FullName, newName);
             int n = 2;
-            while (File.Exists(newPath))
+            while (System.IO.File.Exists(newPath))
             {
                 newName = $"{t.Year:0000}-{t.Month:00}-{t.Day:00}_{t.Hour:00}-{t.Minute:00}_{n}{f.Extension.ToLower()}";
                 newPath = Path.Combine(f.Directory.FullName, newName);
                 n++;
             }
+
             if (newName != f.Name)
             {
-                Console.WriteLine($"{f.Name} -> {newName}");
-                File.Move(f.FullName, newPath);
-                File.SetCreationTime(newPath, t);
+                Moves.Add(new MoveSuggestion()
+                {
+                    File = f,
+                    ImageDate = t,
+                    NewName = newName
+                });
+                if (OnProgress != null)
+                {
+                    OnProgress(this, new ProgressEventArgs() { Message = $"Found {Moves.Count} files..." });
+                }
             }
         }
     }

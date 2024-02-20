@@ -71,4 +71,28 @@
 	  </Compile>
 	</ItemGroup>
 
+	<ItemGroup>
+    <MauiXaml Update="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Duplicates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Filenames.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Duplicates.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	  <None Update="Settings.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	</ItemGroup>
+
 </Project>

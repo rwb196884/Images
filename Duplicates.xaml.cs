@@ -1,20 +1,19 @@
 using CommunityToolkit.Maui.Storage;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
-using System;
 using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace Rwb.Images
 {
-
-    public partial class Filenames : ContentPage
+    public partial class Duplicates : ContentPage
     {
         private DirectoryInfo _Root;
-        private Rename _Rename;
+        private DuplicateDetector _Detector;
         private int _I;
 
-        public Filenames()
+        public Duplicates()
         {
             InitializeComponent();
         }
@@ -33,38 +32,41 @@ namespace Rwb.Images
                 if (!_Root.Exists)
                 {
                     LabelLocation.Text = "INVALID: " + result.Folder.Path;
-                    ButtonStart.IsEnabled = false;
+                    ButtonStartScan.IsEnabled = false;
                 }
                 else
                 {
                     LabelLocation.Text = "Location: " + result.Folder.Path;
-                    ButtonStart.IsEnabled = true;
+                    ButtonStartScan.IsEnabled = true;
                 }
             }
             else
             {
                 LabelLocation.Text = "No location selected.";
-                ButtonStart.IsEnabled = true;
+                ButtonStartScan.IsEnabled = true;
             }
         }
 
-        private async void OnClickButtonStart(object sender, EventArgs e)
+        private async void OnClickButtonStartScan(object sender, EventArgs e)
         {
-            _Rename = new Rename(_Root);
+            _Detector = new DuplicateDetector(_Root);
+            _Detector.OnProgress += _Detector_OnProgress;
             ButtonChooseLocation.IsEnabled = false;
-            ButtonStart.IsEnabled = false;
-            await Task.Run(_Rename.Detect);
-            _I = 0;
-            if(_Rename.Moves.Count == 0)
+            ButtonStartScan.IsEnabled = false;
+            try
             {
-                LabelScanning.Text = "No images found to move.";
-                return;
+                await Task.Run(_Detector.Detect);
             }
+            catch (Exception ex)
+            {
+
+            }
+            _I = 0;
             Show();
             Results.IsVisible = true;
         }
 
-        private void _Rename_OnProgress(object sender, ProgressEventArgs args)
+        private void _Detector_OnProgress(object sender, ProgressEventArgs args)
         {
             if (MainThread.IsMainThread)
             {
@@ -79,52 +81,45 @@ namespace Rwb.Images
             }
             else
             {
-                MainThread.BeginInvokeOnMainThread(() => _Rename_OnProgress(sender, args));
+                MainThread.BeginInvokeOnMainThread(() => _Detector_OnProgress(sender, args));
             }
         }
 
         private void Show()
         {
-            if( _I >= _Rename.Moves.Count )
+            Hashed h = _Detector.Compared[_I];
+            while (!h.Left.Exists || !h.Right.Exists)
             {
-                LabelScanning.Text = "No more images foud.";
-                Results.IsVisible = false;
-                return;
+                _I++;
+                h = _Detector.Compared[_I];
             }
 
-            try
-            {
-                MoveSuggestion m = _Rename.Moves[_I];
-                while (!m.File.Exists)
-                {
-                    _I++;
-                    m = _Rename.Moves[_I];
-                }
+            ButtonSkip.Text = $"Skip ({h.Compare * 100:#0})%";
 
-                MoveDescription.Text = $"{m.File.FullName} -> {m.NewName}";
-                ImageToMove.Source = ImageSource.FromFile(m.File.FullName);
-            }
-            catch( Exception e)
-            {
+            LabelLeft.Text = h.Left.FullName;
+            ImageLeft.Source = ImageSource.FromFile(h.Left.FullName);
 
-            }
+            LabelRight.Text = h.Right.FullName;
+            ImageRight.Source = ImageSource.FromFile(h.Right.FullName);
         }
 
-        private void OnClickButtonOk(object sender, EventArgs e)
+        private void OnClickButtonDeleteLeft(object sender, EventArgs e)
         {
-            try
-            {
-                MoveSuggestion m = _Rename.Moves[_I];
-                m.Do();
-                _I++;
-            }
-            catch( Exception ex)
-            {
-
-            }
+            Hashed h = _Detector.Compared[_I];
+            h.Left.Delete();
+            _I++;
             Show();
         }
-        private void OnClickButtonSkip(object sender, EventArgs e)
+
+        private void OnClickButtonDeleteRight(object sender, EventArgs e)
+        {
+            Hashed h = _Detector.Compared[_I];
+            h.Right.Delete();
+            _I++;
+            Show();
+        }
+
+        private void OnClickButtonButtonSkip(object sender, EventArgs e)
         {
             _I++;
             Show();

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Rwb.Images.Duplicates"
+             Title="Find duplicate images"
+             >
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+                <Button x:Name="ButtonBack" Text="Back" Clicked="OnClickButtonBack" />
+
+                <Button
+                x:Name="ButtonChooseLocation"
+                Text="Choose location" 
+                Clicked="OnClickButtonChooseLocation"
+                HorizontalOptions="Fill" />
+                <Label
+                x:Name="LabelLocation"
+                Text="" />
+                <Button
+                x:Name="ButtonStartScan"
+                Text="Start scan" 
+                Clicked="OnClickButtonStartScan"
+                HorizontalOptions="Fill" 
+                IsEnabled="False"
+                />
+                <Label
+                x:Name="LabelScanning"
+                Text="" />
+            </VerticalStackLayout>
+            <VerticalStackLayout
+                    x:Name="Results"
+                    IsVisible="false"
+                    >
+                <Label
+                x:Name="LabelMatch"
+                Text="" />
+
+                <Button
+                x:Name="ButtonSkip"
+                Text="Skip"
+                Clicked="OnClickButtonButtonSkip"
+                HorizontalOptions="Fill" />
+
+                <Image
+                x:Name="ImageLeft"
+                HeightRequest="185"
+                Aspect="AspectFit" />
+
+                <Label
+                x:Name="LabelLeft"
+                Text="" />
+                <Button
+                x:Name="ButtonDeleteLeft"
+                Text="Delete" 
+                SemanticProperties.Hint="Counts the number of times you click"
+                Clicked="OnClickButtonDeleteLeft"
+                HorizontalOptions="Fill" />
+
+                <Image
+                x:Name="ImageRight"
+                HeightRequest="185"
+                Aspect="AspectFit" />
+
+                <Label
+                x:Name="LabelRight"
+                Text="" />
+                <Button
+                x:Name="ButtonDeleteRight"
+                Text="Delete" 
+                SemanticProperties.Hint="Counts the number of times you click"
+                Clicked="OnClickButtonDeleteRight"
+                HorizontalOptions="Fill" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

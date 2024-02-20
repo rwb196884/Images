@@ -3,7 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Rwb.Images.Filenames"
              Title="Filenames and timestamps">
-    <VerticalStackLayout>
+    <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+        <Button x:Name="ButtonBack" Text="Back" Clicked="OnClickButtonBack" />
         <Button
                 x:Name="ButtonChooseLocation"
                 Text="Choose location" 
@@ -22,5 +25,30 @@
         <Label
                 x:Name="LabelScanning"
                 Text="" />
+        <VerticalStackLayout
+        x:Name="Results"
+        IsVisible="false"
+            Padding="30,0"
+            Spacing="25"
+        >
+            <Image
+                x:Name="ImageToMove"
+                HeightRequest="185"
+                Aspect="AspectFit" />
+        <Label
+                x:Name="MoveDescription"
+                Text="" />
+        <Button
+                x:Name="ButtonOk"
+                Text="Rename and set created date" 
+                Clicked="OnClickButtonOk"
+                HorizontalOptions="Fill" />
+        <Button
+                x:Name="ButtonSkip"
+                Text="Skip" 
+                Clicked="OnClickButtonSkip"
+                HorizontalOptions="Fill" />
+
+    </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>
