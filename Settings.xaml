@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Rwb.Images.Settings"
              Title="Settings">
-    <VerticalStackLayout>
+    <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
         <Button x:Name="ButtonBack" Text="Back" Clicked="OnClickButtonBack" />
         <Label 
             Text="TODO: filename rewrite rules"

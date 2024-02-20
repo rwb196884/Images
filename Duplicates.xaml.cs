@@ -4,6 +4,7 @@ using Microsoft.Maui.Controls;
 using System.IO;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
 
 namespace Rwb.Images
 {
@@ -61,9 +62,21 @@ namespace Rwb.Images
             {
 
             }
-            _I = 0;
-            Show();
-            Results.IsVisible = true;
+
+            if(_Detector.Compared.Count > 0)
+            {
+                LabelScanning.Text = $"{_Detector.Files} files. {_Detector.Compared.Where(z => z.Compare >= 0.75).Count()} pairs with at least 75% match.";
+                _I = 0;
+                Show();
+                Setup.IsVisible = false;
+                Results.IsVisible = true;
+            }
+            else
+            {
+                LabelScanning.Text = $"{_Detector.Files} files. No matches.";
+                ButtonChooseLocation.IsEnabled = true;
+                ButtonStartScan.IsEnabled = false;
+            }
         }
 
         private void _Detector_OnProgress(object sender, ProgressEventArgs args)

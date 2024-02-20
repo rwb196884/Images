@@ -70,6 +70,9 @@ namespace Rwb.Images
     internal class Rename
     {
         public event ProgressEvent OnProgress;
+        private int _Files;
+        private int _Skipped;
+        public int Files { get { return _Files; } }
 
         private readonly string[] _Extensions = new string[] { ".jpg", ".jpeg", ".png" };
 
@@ -99,12 +102,9 @@ namespace Rwb.Images
 
         public void Detect()
         {
+            _Files = 0;
+            _Skipped = 0;
             Process(_Root);
-
-            if (OnProgress != null)
-            {
-                //OnProgress(this, new ProgressEventArgs() { Percent = 0, Message = $"Comparing {_Files} files..." });
-            }
         }
 
         private void Process(DirectoryInfo dir)
@@ -122,6 +122,7 @@ namespace Rwb.Images
 
         private void Process(FileInfo file)
         {
+            _Files++;
             if (!_Extensions.Contains(file.Extension.ToLower()))
             {
                 if (_OtherExtensions.ContainsKey(file.Extension.ToLower()))
@@ -209,10 +210,15 @@ namespace Rwb.Images
                     ImageDate = t,
                     NewName = newName
                 });
-                if (OnProgress != null)
-                {
-                    OnProgress(this, new ProgressEventArgs() { Message = $"Found {Moves.Count} files..." });
-                }
+            }
+            else
+            {
+                _Skipped++;
+            }
+
+            if (OnProgress != null)
+            {
+                OnProgress(this, new ProgressEventArgs() { Message = $"{_Files} files. {Moves.Count} to move, {_Skipped} to leave." });
             }
         }
     }

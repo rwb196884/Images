@@ -51,17 +51,23 @@ namespace Rwb.Images
         private async void OnClickButtonStart(object sender, EventArgs e)
         {
             _Rename = new Rename(_Root);
+            _Rename.OnProgress += _Rename_OnProgress;
             ButtonChooseLocation.IsEnabled = false;
             ButtonStart.IsEnabled = false;
             await Task.Run(_Rename.Detect);
-            _I = 0;
-            if(_Rename.Moves.Count == 0)
+            LabelScanning.Text = $"Found {_Rename.Moves.Count} of {_Rename.Files} files that could be renamed.";
+            if (_Rename.Moves.Count > 0)
             {
-                LabelScanning.Text = "No images found to move.";
+                _I = 0;
+                Show();
+                Results.IsVisible = true;
+            }
+            else
+            {
+                ButtonChooseLocation.IsEnabled = true;
+                ButtonStart.IsEnabled = false;
                 return;
             }
-            Show();
-            Results.IsVisible = true;
         }
 
         private void _Rename_OnProgress(object sender, ProgressEventArgs args)
@@ -85,7 +91,7 @@ namespace Rwb.Images
 
         private void Show()
         {
-            if( _I >= _Rename.Moves.Count )
+            if (_I >= _Rename.Moves.Count)
             {
                 LabelScanning.Text = "No more images foud.";
                 Results.IsVisible = false;
@@ -104,7 +110,7 @@ namespace Rwb.Images
                 MoveDescription.Text = $"{m.File.FullName} -> {m.NewName}";
                 ImageToMove.Source = ImageSource.FromFile(m.File.FullName);
             }
-            catch( Exception e)
+            catch (Exception e)
             {
 
             }
@@ -118,7 +124,7 @@ namespace Rwb.Images
                 m.Do();
                 _I++;
             }
-            catch( Exception ex)
+            catch (Exception ex)
             {
 
             }

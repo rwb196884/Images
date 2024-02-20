@@ -9,10 +9,10 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
-            <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
                 <Button x:Name="ButtonBack" Text="Back" Clicked="OnClickButtonBack" />
+            <VerticalStackLayout
+                    x:Name="Setup"
+            Spacing="25">
 
                 <Button
                 x:Name="ButtonChooseLocation"
@@ -29,13 +29,14 @@
                 HorizontalOptions="Fill" 
                 IsEnabled="False"
                 />
+            </VerticalStackLayout>
                 <Label
                 x:Name="LabelScanning"
                 Text="" />
-            </VerticalStackLayout>
             <VerticalStackLayout
                     x:Name="Results"
                     IsVisible="false"
+            Spacing="25"
                     >
                 <Label
                 x:Name="LabelMatch"

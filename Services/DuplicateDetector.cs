@@ -25,6 +25,7 @@ namespace Rwb.Images
     {
         public event ProgressEvent OnProgress;
         private int _Files;
+        public int Files {  get {  return _Files; } }   
 
         private readonly string[] _Extensions = new string[] { ".jpg", ".jpeg", ".png" };
 
@@ -61,10 +62,6 @@ namespace Rwb.Images
                 });
             }).OrderByDescending(z => z.Compare)
             .ToList();
-            if (OnProgress != null)
-            {
-                OnProgress(this, new ProgressEventArgs() {  Message = $"Compared {_Hashes.Count} files." });
-            }
         }
 
         private void Process(DirectoryInfo dir)

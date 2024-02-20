@@ -7,21 +7,26 @@
             Padding="30,0"
             Spacing="25">
         <Button x:Name="ButtonBack" Text="Back" Clicked="OnClickButtonBack" />
-        <Button
+        <VerticalStackLayout
+                    x:Name="Setup"
+            Spacing="25">
+
+            <Button
                 x:Name="ButtonChooseLocation"
                 Text="Choose location" 
                 Clicked="OnClickButtonChooseLocation"
                 HorizontalOptions="Fill" />
-        <Label
+            <Label
                 x:Name="LabelLocation"
                 Text="" />
-        <Button
+            <Button
                 x:Name="ButtonStart"
                 Text="GO" 
                 Clicked="OnClickButtonStart"
                 HorizontalOptions="Fill" 
                 IsEnabled="False"
                 />
+        </VerticalStackLayout>
         <Label
                 x:Name="LabelScanning"
                 Text="" />
@@ -35,20 +40,20 @@
                 x:Name="ImageToMove"
                 HeightRequest="185"
                 Aspect="AspectFit" />
-        <Label
+            <Label
                 x:Name="MoveDescription"
                 Text="" />
-        <Button
+            <Button
                 x:Name="ButtonOk"
                 Text="Rename and set created date" 
                 Clicked="OnClickButtonOk"
                 HorizontalOptions="Fill" />
-        <Button
+            <Button
                 x:Name="ButtonSkip"
                 Text="Skip" 
                 Clicked="OnClickButtonSkip"
                 HorizontalOptions="Fill" />
 
-    </VerticalStackLayout>
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>
