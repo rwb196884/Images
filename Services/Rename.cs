@@ -8,7 +8,7 @@ using IM = MetadataExtractor;
 
 namespace Rwb.Images
 {
-    internal class MoveSuggestion
+    public class MoveSuggestion
     {
         public FileInfo File { get; set; }
         public DateTime ImageDate { get; set; }
@@ -22,9 +22,9 @@ namespace Rwb.Images
         }
     }
 
-    internal delegate void RenameProgressEvent(object sender, ProgressEventArgs args);
+    public delegate void RenameProgressEvent(object sender, ProgressEventArgs args);
 
-    class FilenameRewrite
+    public class FilenameRewrite
     {
         public Regex Source { get; set; }
         public int? MatchYear { get; set; }
@@ -67,7 +67,7 @@ namespace Rwb.Images
     }
 
 
-    internal class Rename
+    public class Rename
     {
         public event ProgressEvent OnProgress;
         private int _Files;

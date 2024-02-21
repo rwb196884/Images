@@ -5,18 +5,34 @@ using System.IO;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Rwb.Images.Services;
 
 namespace Rwb.Images
 {
     public partial class Duplicates : ContentPage
     {
+        class DuplicatesBindingContext
+        {
+            public bool Paid { get; set; }
+        }
+
         private DirectoryInfo _Root;
         private DuplicateDetector _Detector;
         private int _I;
+        private readonly BuildConfiguration _BuildConfiguration;
 
-        public Duplicates()
+        private readonly DuplicatesBindingContext _BindingContext;
+
+        public Duplicates(BuildConfiguration buildConfiguration)
         {
             InitializeComponent();
+            Algorithm = ImageHashingAlgorighm.Average;
+            _BuildConfiguration = buildConfiguration;
+            _BindingContext = new DuplicatesBindingContext()
+            {
+                Paid = _BuildConfiguration.Paid
+            };
+            BindingContext = _BindingContext;
         }
 
         private async void OnClickButtonBack(object sender, EventArgs e)
@@ -48,9 +64,35 @@ namespace Rwb.Images
             }
         }
 
+        public ImageHashingAlgorighm Algorithm { get; set; }
+        private async void OnAlgorithmChange(RadioButton sender, CheckedChangedEventArgs e)
+        {
+            // The docs bullshit about two-way binding, but don't deign to give an example. Cunts.
+            if(e.Value)
+            {
+                switch(sender.Value)
+                {
+                    case "Average":
+                        Algorithm = ImageHashingAlgorighm.Average;
+                        break;
+                    case "Median":
+                        Algorithm = ImageHashingAlgorighm.Median64;
+                        break;
+                    case "Difference":
+                        Algorithm = ImageHashingAlgorighm.Difference64;
+                        break;
+                    case "DCT":
+                        Algorithm = ImageHashingAlgorighm.Dct;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
+
         private async void OnClickButtonStartScan(object sender, EventArgs e)
         {
-            _Detector = new DuplicateDetector(_Root);
+            _Detector = new DuplicateDetector(_Root, Algorithm);
             _Detector.OnProgress += _Detector_OnProgress;
             ButtonChooseLocation.IsEnabled = false;
             ButtonStartScan.IsEnabled = false;
@@ -63,7 +105,7 @@ namespace Rwb.Images
 
             }
 
-            if(_Detector.Compared.Count > 0)
+            if (_Detector.Compared.Count > 0)
             {
                 LabelScanning.Text = $"{_Detector.Files} files. {_Detector.Compared.Where(z => z.Compare >= 0.75).Count()} pairs with at least 75% match.";
                 _I = 0;

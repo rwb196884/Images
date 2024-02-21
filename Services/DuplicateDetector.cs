@@ -6,26 +6,35 @@ using System.Linq;
 
 namespace Rwb.Images
 {
-    internal class Hashed
+    public class Hashed
     {
         public FileInfo Left;
         public FileInfo Right;
         public float Compare;
     }
 
-    internal class ProgressEventArgs
+    public class ProgressEventArgs
     {
         public string Message { get; set; }
     }
 
-    internal delegate void ProgressEvent(object sender, ProgressEventArgs args);
+    public delegate void ProgressEvent(object sender, ProgressEventArgs args);
 
+    public enum ImageHashingAlgorighm
+    {
+        Average,
+        Median64,
+        //Median256,
+        Difference64,
+        //Difference256,
+        Dct
+    }
 
-    internal class DuplicateDetector
+    public class DuplicateDetector
     {
         public event ProgressEvent OnProgress;
         private int _Files;
-        public int Files {  get {  return _Files; } }   
+        public int Files { get { return _Files; } }
 
         private readonly string[] _Extensions = new string[] { ".jpg", ".jpeg", ".png" };
 
@@ -35,12 +44,14 @@ namespace Rwb.Images
         public List<Hashed> Compared { get; private set; }
 
         private readonly DirectoryInfo _Root;
+        private readonly ImageHashingAlgorighm _Alorithm;
 
-        public DuplicateDetector(DirectoryInfo root)
+        public DuplicateDetector(DirectoryInfo root, ImageHashingAlgorighm algorighm)
         {
             _Hashes = new Dictionary<FileInfo, ulong>();
             _ImageHasher = new ImageHashes(new ImageSharpTransformer());
             _Root = root;
+            _Alorithm = algorighm;
         }
 
         public void Detect()
@@ -85,14 +96,37 @@ namespace Rwb.Images
             }
             try
             {
-                _Hashes.Add(file, _ImageHasher.CalculateDctHash(file.FullName));
+                switch (_Alorithm)
+                {
+                    case ImageHashingAlgorighm.Average:
+                        _Hashes.Add(file, _ImageHasher.CalculateAverageHash64(file.FullName));
+                        break;
+                    case ImageHashingAlgorighm.Median64:
+                        _Hashes.Add(file, _ImageHasher.CalculateMedianHash64(file.FullName));
+                        break;
+                    //    case ImageHashingAlgorighm.Median256:
+                    //_Hashes.Add(file, _ImageHasher.CalculateMedianHash256(file.FullName));
+                    //        break;
+                    case ImageHashingAlgorighm.Difference64:
+                        _Hashes.Add(file, _ImageHasher.CalculateDifferenceHash64(file.FullName));
+                        break;
+                    //    case ImageHashingAlgorighm.Difference256:
+                    //_Hashes.Add(file, _ImageHasher.CalculateDifferenceHash256(file.FullName));
+                    //        break;
+                    case ImageHashingAlgorighm.Dct:
+                        _Hashes.Add(file, _ImageHasher.CalculateDctHash(file.FullName));
+                        break;
+                    default:
+                        throw new NotImplementedException();
+
+                }
             }
             catch (Exception e)
             {
 
             }
             _Files++;
-            if(OnProgress != null)
+            if (OnProgress != null)
             {
                 OnProgress(this, new ProgressEventArgs() { Message = $"Found {_Files} files..." });
             }

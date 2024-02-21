@@ -4,7 +4,6 @@
              x:Class="Rwb.Images.Duplicates"
              Title="Find duplicate images"
              >
-
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
@@ -22,6 +21,16 @@
                 <Label
                 x:Name="LabelLocation"
                 Text="" />
+                <StackLayout
+                    RadioButtonGroup.GroupName="{Binding Algorithm}"
+             RadioButtonGroup.SelectedValue="{Binding Algorithm}">
+                    <Label Text="Image hashing algorithm" />
+                    <RadioButton Content="Average" GroupName="Algorithm" Value="Average" CheckedChanged="OnAlgorithmChange" IsEnabled="{Binding Paid}"  />
+                    <RadioButton Content="Median" GroupName="Algorithm" Value="Median"  CheckedChanged="OnAlgorithmChange" IsEnabled="{Binding Paid}"/>
+                    <RadioButton Content="Difference" GroupName="Algorithm" Value="Difference"  CheckedChanged="OnAlgorithmChange" IsEnabled="{Binding Paid}" />
+                    <RadioButton Content="Discrete cosine transform (slow)" GroupName="Algorithm" Value="DCT" CheckedChanged="OnAlgorithmChange" IsChecked="True"/>
+                </StackLayout>
+
                 <Button
                 x:Name="ButtonStartScan"
                 Text="Start scan" 

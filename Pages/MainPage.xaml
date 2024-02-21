@@ -9,6 +9,7 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
+            <Label x:Name="LabelPaid" />
             <Button x:Name="ButtonFilenames" Text="Fix filenames" Clicked="OnClickButtonFilenames" />
             <Button x:Name="ButtonDuplicates" Text="Find and review duplicate images" Clicked="OnClickButtonDuplicates" />
             <Button x:Name="ButtonSettings" Text="Settings" Clicked="OnClickButtonSettings" />
