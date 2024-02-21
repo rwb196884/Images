@@ -42,7 +42,13 @@
                 HeightRequest="185"
                 Aspect="AspectFit" />
                 <Label
-                x:Name="MoveDescription"
+                x:Name="MoveDescriptionDir"
+                Text="" />
+                <Label
+                x:Name="MoveDescriptionS"
+                Text="" />
+                <Label
+                x:Name="MoveDescriptionT"
                 Text="" />
                 <Button
                 x:Name="ButtonOk"
@@ -53,6 +59,11 @@
                 x:Name="ButtonSkip"
                 Text="Skip" 
                 Clicked="OnClickButtonSkip"
+                HorizontalOptions="Fill" />
+                <Button
+                x:Name="ButtonAll"
+                Text="** all **" 
+                Clicked="OnClickButtonAll"
                 HorizontalOptions="Fill" />
 
             </VerticalStackLayout>

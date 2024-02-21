@@ -107,7 +107,9 @@ namespace Rwb.Images
                     m = _Rename.Moves[_I];
                 }
 
-                MoveDescription.Text = $"{m.File.FullName} -> {m.NewName}";
+                MoveDescriptionDir.Text = $"{m.File.Directory.FullName}";
+                MoveDescriptionS.Text = $"{m.File.Name}";
+                MoveDescriptionT.Text = $"{m.NewName}";
                 ImageToMove.Source = ImageSource.FromFile(m.File.FullName);
             }
             catch (Exception e)
@@ -130,10 +132,22 @@ namespace Rwb.Images
             }
             Show();
         }
+
         private void OnClickButtonSkip(object sender, EventArgs e)
         {
             _I++;
             Show();
+        }
+        private void OnClickButtonAll(object sender, EventArgs e)
+        {
+            foreach (MoveSuggestion m in _Rename.Moves)
+            {
+                m.Do();
+            }
+            LabelScanning.Text = $"Renamed {_Rename.Moves.Count} files.";
+            ButtonChooseLocation.IsEnabled = true;
+            ButtonStart.IsEnabled = false;
+            Results.IsVisible = false;
         }
     }
 }
