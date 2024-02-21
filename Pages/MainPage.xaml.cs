@@ -2,7 +2,6 @@
 using Microsoft.Maui.Controls;
 using Rwb.Images.Services;
 using System;
-using System.Reflection;
 
 namespace Rwb.Images
 {
@@ -28,7 +27,7 @@ namespace Rwb.Images
         {
             PermissionStatus sp1 = await Permissions.RequestAsync<Permissions.StorageRead>();
             PermissionStatus ps2 = await Permissions.RequestAsync<Permissions.StorageWrite>();
-            Filenames w = new Filenames();
+            Filenames w = new Filenames(_BuildConfiguration);
             await Navigation.PushAsync(w);
         }
 
